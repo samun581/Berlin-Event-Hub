@@ -1,176 +1,156 @@
-# Berlin Event Hub
+Berlin Event Hub
 
-Berlin Event Hub is a full-stack event discovery and booking application for the M607 Computer Science Application Lab.
+Berlin Event Hub is a full-stack event discovery and booking application developed for the M607 Computer Science Application Lab. It allows users to discover events in Berlin, create accounts, make and cancel bookings, and manage their profiles. Administrators can manage events, view bookings and statistics, and send event reminders.
 
-## Requirements
+Main Features
 
-Install before the first run:
+- Event discovery, search and filtering
+- Event details with date, time, price, capacity and availability
+- OpenStreetMap/Nominatim location integration
+- User registration and login
+- JWT-based authentication
+- User and administrator roles
+- Event booking and cancellation
+- Duplicate, sold-out and past-event booking protection
+- User dashboard and profile management
+- Change password and forgot/reset password
+- Admin event creation, editing and deletion
+- Admin booking details and statistics
+- Booking confirmation emails
+- Password-reset emails
+- Admin-triggered event reminder emails
+- Responsive design for desktop, tablet and mobile
 
-- **Node.js 22 LTS** (22.18.0 or newer 22.x recommended)
-- **npm** (included with Node.js)
-- **MongoDB Community Server 8.0**
-- **MongoDB Shell (`mongosh`)**
-- A modern browser
+Technologies
 
-Check installation:
+Frontend:
+Vue.js
+Vite
+HTML
+CSS
+JavaScript
 
-```bash
-node -v
-npm -v
-mongosh --version
-```
+Backend:
+Node.js
+Express.js
+MongoDB
+JWT
+bcryptjs
 
-## 1. Start MongoDB
-
-MongoDB must be running before the app starts.
-
-**macOS (Homebrew):**
-
-```bash
-brew tap mongodb/brew
-brew install mongodb-community@8.0
-brew services start mongodb-community@8.0
-mongosh
-```
-
-**Windows:** install MongoDB Community Server as a Windows service, then test:
-
-```powershell
-mongosh
-```
-
-If needed, start it from Administrator PowerShell:
-
-```powershell
-Start-Service MongoDB
-```
+External Services:
+OpenStreetMap / Nominatim
+SendGrid
 
 
-**Linux:** install MongoDB Community Server and `mongosh` using MongoDB's official instructions for your distribution, start the MongoDB service, then run `mongosh`.
+Requirements
 
-Type `exit` to leave `mongosh` after the connection test.
+Before running the project, install:
 
-## 2. Install project dependencies
+- Node.js 22 LTS
+- npm
+- MongoDB Community Server 8.0
+- MongoDB Shell (mongosh)
 
-Extract the ZIP fully and open the main project folder. Do not copy `node_modules` from another computer.
 
-```bash
+Installation
+
+1. Open the project folder.
+
+2. Install the main project dependencies:
+
 npm install
+
+3. Install the backend dependencies:
+
 cd backend
 npm install
 cd ..
-```
 
-## 3. Create `backend/.env`
+4. Make sure MongoDB is running.
 
-Copy `backend/.env.example` to `backend/.env`.
+You can test the MongoDB connection with:
 
-macOS/Linux:
+mongosh
 
-```bash
-cp backend/.env.example backend/.env
-```
 
-Windows PowerShell:
+Environment Setup
 
-```powershell
-Copy-Item backend/.env.example backend/.env
-```
+Copy:
+
+backend/.env.example
+
+to:
+
+backend/.env
 
 Example:
 
-```text
 JWT_SECRET=choose-a-private-local-secret
 MONGO_URL=mongodb://127.0.0.1:27017
 PORT=3000
 APP_URL=http://localhost:5173
 SENDGRID_API_KEY=
 FROM_EMAIL=
-```
 
-`SENDGRID_API_KEY` and `FROM_EMAIL` are optional for local testing. With them blank, email actions use development preview mode. For **real SendGrid delivery**, create an API key with Mail Send permission, verify the sender address in SendGrid, add both values to `backend/.env`, then restart the app. Never commit the real `.env` file.
+JWT_SECRET, MONGO_URL and PORT are required.
 
-## 4. Run the application
+SENDGRID_API_KEY and FROM_EMAIL are optional for local testing. They are required only for real SendGrid email delivery.
 
-From the main project folder:
+Never upload the real backend/.env file or API keys to GitHub.
 
-```bash
+
+Running the Application
+
+From the main project folder, run:
+
 npm run dev:all
-```
 
-Normally:
+The application normally runs at:
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:3000`
-- Health check: `http://localhost:3000/api/health`
+Frontend: http://localhost:5173
+Backend: http://localhost:3000
 
-Open the exact Local URL shown by Vite. If Vite uses another port (for example 5174), update `APP_URL` in `backend/.env` before testing password-reset links and restart the app.
 
-## 5. First-time data and admin access
+Admin Access
 
-The database is created automatically. Register a normal user in the website first. To promote that user to admin:
+Register a normal account through the application first.
 
-```bash
-mongosh
-```
+To change the account to an administrator, open mongosh and run:
 
-```javascript
 use berlin_event_hub
 
 db.users.updateOne(
   { email: "your-email@example.com" },
   { $set: { role: "admin" } }
 )
-```
 
-Then type `exit`, log out of the website and log in again.
+Log out and log in again to access the administrator features.
 
-## Email behaviour
 
-The project supports SendGrid for:
+Email Support
 
-- automatic booking-confirmation email after a successful booking;
-- password-reset email from **Forgot password?**;
-- manual admin-triggered event reminder email.
+SendGrid is used for:
 
-If SendGrid is not configured, the same flows remain testable through safe development previews in the backend terminal (and a development reset link for Forgot Password). Event reminders are manual, not automatically scheduled.
+- Booking confirmation emails
+- Password-reset emails
+- Event reminder emails
 
-## Main features
+The application can run without SendGrid. If SendGrid is not configured, development preview behaviour is used where supported.
 
-- Public event discovery, search and filtering
-- Event details and OpenStreetMap/Nominatim location map
-- Registration, login, JWT and user/admin roles
-- Strong password and profile validation
-- Booking, availability, duplicate/sold-out/past-event protection
-- Booking cancellation for future events
-- User profile, change password and forgot/reset password
-- Admin event CRUD, booking details and statistics
-- SendGrid email support and manual reminders
-- Responsive desktop/tablet/mobile layout
+For real email delivery, add a valid SENDGRID_API_KEY and verified FROM_EMAIL address to backend/.env.
 
-## Troubleshooting
 
-**MongoDB connection error:** run `mongosh`. If it cannot connect, start the MongoDB service first.
+Production Build
 
-**`npm run dev:all` says script missing:** return to the main project folder (not `backend`) and run it again.
+To create a production build:
 
-**Missing environment error:** confirm `backend/.env` exists and contains `JWT_SECRET`, `MONGO_URL` and `PORT`.
-
-**Vite/Rolldown native binding error:** delete `node_modules` and reinstall on that computer. Do not copy `node_modules` between machines.
-
-**No real email received:** real email requires both `SENDGRID_API_KEY` and a verified `FROM_EMAIL`. Otherwise preview mode is intentional.
-
-## Production build
-
-```bash
 npm run build
+
+To start the production application:
+
 npm start
-```
 
-For deployment, use production environment variables and a production-accessible MongoDB database. Do not upload `backend/.env`.
 
-## Submission links
+Repository
 
-GitHub Repository: **TO BE ADDED**
-
-Deployed Application: **TO BE ADDED**
+GitHub Repository: https://github.com/samun581/Berlin-Event-Hub
